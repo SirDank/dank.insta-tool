@@ -1,16 +1,16 @@
+# Ignore this note for now!
 # Note: dank.insta-tool.py is meant to be run as an .exe by default, if you would like to execute the script, make the below changes...
 #       - uncomment the following line > filepath = os.path.dirname(__file__) # as .py
 #       - comment the following line > filepath = os.path.dirname(sys.argv[0]) # as .exe
 
 import os
-import sys
 import time
 import random
 import instaloader
 from instabot import Bot
 import concurrent.futures
-from colorama import init, Fore, Style
 from alive_progress import alive_bar
+from colorama import init, Fore, Style
 
 os.system("title dank.insta-tool")
 
@@ -18,6 +18,11 @@ try:
     filepath = os.path.dirname(__file__) # as .py
     #filepath = os.path.dirname(sys.argv[0]) # as .exe
     os.chdir(filepath)
+    try:
+        os.mkdir("dank.insta-tool")
+    except:
+        pass
+    os.chdir("dank.insta-tool")
 except:
     pass
 
@@ -83,7 +88,8 @@ while True:
 
     print(f"\n  {white}> {magenta}1. Get and save {white}ghosts {magenta}/ {white}non-ghosts")
     print(f"\n  {white}> {magenta}2. Remove {white}ghost {magenta}followers")
-    print(f"\n  {white}> {magenta}3. Exit")
+    print(f"\n  {white}> {magenta}3. Bulk {white}unfollow")
+    print(f"\n  {white}> {magenta}4. Exit")
     choice = int(input(f"\n  {white}> {magenta}Enter Choice{white}: {magenta}"))
 
     def one():
@@ -100,8 +106,10 @@ while True:
 
         os.system('cls')
         print(banner())
+        
+        # selected posts
 
-        # get usernames of likers and commenters on all your posts
+        # get usernames of likers and commenters on selected posts
 
         print(f"\n  {white}> {magenta}Getting {white}likers {magenta}and {white}commenters [ {magenta}this might take a while {white}]\n")
 
@@ -182,8 +190,8 @@ while True:
         print(f"\n  {white}> {magenta}Saving {white}followers.txt")
         open('followers.txt','w+').write('\n'.join(followers))
         
-        print(f"\n  {white}> {magenta}Tasks Complete! Sleeping 5s...")
-        time.sleep(5)
+        print(f"\n  {white}> {magenta}Tasks Complete! Sleeping 10s...")
+        time.sleep(10)
         
     def two():
 
@@ -234,7 +242,7 @@ while True:
         os.system('cls')
         print(banner())
 
-        print(f"\n  {white}> {magenta}Removing {white}ghosts...\n")
+        print(f"\n  {white}> {magenta}Removing {white}{len(ghosts)} ghosts...\n")
         multithread(remove_follower, ghosts)
         
         # save txt files
@@ -251,19 +259,103 @@ while True:
         print(f"\n  {white}> {magenta}Saving {white}unremoved_ghosts.txt")
         open('unremoved_ghosts.txt','w+').write('\n'.join(unremoved_ghosts))
         
-        print(f"\n  {white}> {magenta}Tasks Complete! Sleeping 5s...")
-        time.sleep(5)
+        print(f"\n  {white}> {magenta}Tasks Complete! Sleeping 10s...")
+        time.sleep(10)
         
+    def three():
+        
+        # check if to_unfollow.txt exists
+        
+        try:
+            open("to_unfollow.txt","x")
+            print(f"\n  {white}> {magenta}Created {white}to_unfollow.txt")
+        except:
+            print(f"\n  {white}> {white}to_unfollow.txt {magenta}already exists!")
+            
+        print(f"\n  {white}> {magenta}Add usernames to {white}to_unfollow.txt {magenta}to bulk unfollow")
+        os.system("to_unfollow.txt")
+        wait = input(f"\n  {white}> {magenta}Press Enter to begin...\n\n")
+        
+        try:
+            to_unfollow = list(set(open("to_unfollow.txt","r").read().splitlines()))
+        except:
+            print(f"  {white}> {red}The file {white}to_unfollow.txt {red}does not exist! Please create it and add username first before using {white}option 3{red}!")
+            print(f"  {white}> {red}Going to menu in 5s...")
+            time.sleep(5)
+            return
+        
+        bot = Bot()
+
+        while True:
+            try:
+                bot.login()
+                break
+            except Exception as e:
+                wait = input(f"\n  {white}> {red}Failed! Press {white}ENTER {red}to try again! | {str(e)}")
+                
+        unfollowed = []
+        failed_unfollow = []
+        
+        # unfollow
+        
+        def unfollow(user):
+            
+            errors = 0
+            while True:
+                try:
+                    user_id = bot.get_user_id_from_username(user)
+                    bot.api.unfollow(user_id)
+                    unfollowed.append(user)
+                    print(f"\n  {white}> {green}Unfollowed {white}{user}{green}!")
+                    time.sleep(.3)
+                    break
+                except Exception as e:
+                    errors += 1
+                    if errors >= 4:
+                        failed_unfollow.append(user)
+                        print(f"\n  {white}> {red}Failed {white}{user} {red}| {str(e)}")
+                        break
+                    print(f"\n  {white}> {red}Retrying {white}{user}")
+                    time.sleep(10)
+                    
+        os.system('cls')
+        print(banner())
+
+        print(f"\n  {white}> {magenta}Bulk {white}unfollowing {len(to_unfollow)} {magenta}users...\n")
+        multithread(unfollow, to_unfollow)
+        
+        # save txt files
+
+        os.system('cls')
+        print(banner())
+
+        print(f"\n  {white}> {magenta}Unfollowed {white}{len(unfollowed)} {magenta}users!")
+        print(f"\n  {white}> {red}Failed to unfollow {white}{len(failed_unfollow)} {red}users!")
+
+        print(f"\n  {white}> {magenta}Saving {white}unfollowed.txt")
+        open('unfollowed.txt','w+').write('\n'.join(unfollowed))
+
+        print(f"\n  {white}> {magenta}Saving {white}failed_unfollow.txt")
+        open('failed_unfollow.txt','w+').write('\n'.join(failed_unfollow))
+        
+        print(f"\n  {white}> {magenta}Tasks Complete! Sleeping 10s...")
+        time.sleep(10)
+
     # input
         
     os.system('cls')
-    print(banner())
 
     if choice == 1:
+        print(banner())
         one()
 
     elif choice == 2:
+        print(banner())
         two()
         
     elif choice == 3:
+        print(banner())
+        three()
+        
+    elif choice == 4:
         break
