@@ -1,5 +1,5 @@
 # dank.insta-tool
-This simple tool helps you remove ghost followers!
+This simple tool helps you remove ghost followers and can also bulk unfollow!
 
 A ghost is a follower who has never:
 - liked a post
