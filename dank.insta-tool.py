@@ -1,8 +1,3 @@
-# Ignore this note for now!
-# Note: dank.insta-tool.py is meant to be run as an .exe by default, if you would like to execute the script, make the below changes...
-#       - uncomment the following line > filepath = os.path.dirname(__file__) # as .py
-#       - comment the following line > filepath = os.path.dirname(sys.argv[0]) # as .exe
-
 import os
 import time
 import random
@@ -18,13 +13,10 @@ try:
     filepath = os.path.dirname(__file__) # as .py
     #filepath = os.path.dirname(sys.argv[0]) # as .exe
     os.chdir(filepath)
-    try:
-        os.mkdir("dank.insta-tool")
-    except:
-        pass
+    try:os.mkdir("dank.insta-tool")
+    except:pass
     os.chdir("dank.insta-tool")
-except:
-    pass
+except:pass
 
 banner_ascii = '''
 
@@ -42,10 +34,7 @@ banner_ascii = '''
 init(autoreset=True)
 red = Fore.RED + Style.BRIGHT
 green = Fore.GREEN + Style.BRIGHT
-yellow = Fore.YELLOW + Style.BRIGHT
-blue = Fore.BLUE + Style.BRIGHT
 magenta = Fore.MAGENTA + Style.BRIGHT
-cyan = Fore.CYAN + Style.BRIGHT
 white = Fore.WHITE + Style.BRIGHT
 
 # randomized banner color
